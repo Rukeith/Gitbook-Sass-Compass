@@ -4,3 +4,10 @@ Reference Sass and Compass official website, "Sass and Compass in action" by Wyn
 
 ##Chapter 1
 1. Basic Syntax
+	* Variables：`$`
+	* Comments: `/* */` and `//`
+2. Nesting
+	* Referencing Parent Selectors: `&`
+	* Nested Properties
+3. Operations
+	* Number Operations
