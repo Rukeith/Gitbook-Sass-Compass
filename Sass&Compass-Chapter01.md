@@ -13,8 +13,7 @@ Sass 提供兩種的 syntax 格式，`Sass`和`Scss`。其寫法差異在於有�
 
 ##Basic Syntax
 ###Variables：$
-Sass 提供了宣告變數的功能，可以宣告變數，儲存各種會重複使用的屬性值，例如：顏色、字體或長寬度。Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名包含了多種的特殊字元，例如了底線和破折號。  
-值得一提的是變數鳴鐘，底線和破折號是可以互換的。例如宣告了變數`$main-width`可以用`$main_width`來呼叫，反之亦然。
+Sass 提供了宣告變數的功能，可以宣告變數，儲存各種會重複使用的屬性值，例如：顏色、字體或長寬度。Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名包含了多種的特殊字元，例如了底線和破折號。值得一提的是，變數名中底線和破折號是可以互換的。例如宣告了變數`$main-width`可以用`$main_width`來呼叫，反之亦然。
 
 	// CSS
 	body {
@@ -236,9 +235,9 @@ Sass 支援了標準的數學運作(addition `+`, subtraction `-`, multiplicatio
 ####Division /
 在 CSS 中`/`被用來分隔數字，但在 Sass 中有三種情況`/`可以被用作➗。
 
-1. 如果值是儲存在變數或是由函數回傳
-2. 如果值是被括號包住的
-3. 如果值被其他的運算子使用
+1. 如果值是儲存在變數或是由函數回傳  
+2. 如果值是被括號包住的  
+3. 如果值被其他的運算子使用  
 
 		p {
 		  font: 10px/8px;             // Plain CSS, no division
@@ -263,8 +262,38 @@ Sass 支援了標準的數學運作(addition `+`, subtraction `-`, multiplicatio
 		  $line-height: 30px;
 		  font: #{$font-size}/#{$line-height};
 		}
-		
+		 
 		// CSS
 		p {
 		  font: 12px/30px;
+		  // A shorthand font-size: 12px; line-height: 30px;
+		}
+###Color operators
+顏色值的運算會分段處理，這表示會拆分成紅、綠和藍  
+
+		p {
+		  color: #010203 + #040506;
+		  color: #010203 * 2;
+		}
+
+		// CSS
+		p {
+		  // computes 01 + 04 = 05, 02 + 05 = 07, and 03 + 06 = 09
+		  color: #050709;
+		  color: #020406;
+		}
+顏色也可以使用 alpha channel(包含 rgba 或 hsla)做運算，可以使用 opacify 和  transparentize
+
+		$translucent-red: rgba(255, 0, 0, 0.5);
+		p {
+	  		color: rgba(255, 0, 0, 0.75) + rgba(0, 255, 0, 0.75);
+	  		color: opacify($translucent-red, 0.3);
+			background-color: transparentize($translucent-red, 0.25);
+		}
+		
+		// CSS
+		p {
+		  color: rgba(255, 255, 0, 0.75);
+		  color: rgba(255, 0, 0, 0.8);
+		  background-color: rgba(255, 0, 0, 0.25);
 		}
