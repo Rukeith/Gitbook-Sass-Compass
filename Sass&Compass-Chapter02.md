@@ -1,4 +1,4 @@
-#Sass & Compass - Advanced
+#Sass & Compass - Advanced Usage
 
 ##Extend / Inheritance
 這是 Sass 中最常用的功能。使用`@extend`讓你可以把一系列的 CSS 屬性傳遞給另一個選擇器。

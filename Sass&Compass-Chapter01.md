@@ -14,7 +14,7 @@ Sass 提供兩種的 syntax 格式，`Sass`和`Scss`。其寫法差異在於有�
 	}
 
 ##Basic Syntax
-###Variables：$
+###Variables：`$`
 Sass 提供了宣告變數的功能，可以宣告變數，儲存各種會重複使用的屬性值，例如：顏色、字體或長寬度。  
 Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名包含了多種的特殊字元，例如了底線和破折號。值得一提的是，變數名中底線和破折號是可以互換的。例如宣告了變數`$main-width`可以用`$main_width`來呼叫，反之亦然。
 
@@ -41,7 +41,7 @@ Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名
 	  color: $primary-color;
 	}
 
-####!global
+####`!global`
 如果把變數宣告在巢狀的內部，則只有此選擇器的內部可以使用到此變數。可以額外加上`!global`標籤，使其變成全域皆可使用。
 
 	#main {
@@ -62,8 +62,8 @@ Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名
 	  width: 5em;
 	}
 	
-####!default
-可以使用`!default`來設定變數的預設值，當此變數在任何有被設定過值，則預設值無效。若變數沒有被設定過值，或是值為 null，則變數的值為預設。
+####`!default`
+可以使用`!default`來設定變數的預設值，當此變數在任何有被設定過值，則預設值無效。若變數沒有被設定過值，或是值為`null`，則變數的值為預設。
 
 	$content: "First content";
 	$content: "Second content?" !default;
@@ -80,7 +80,7 @@ Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名
 	  new-content: "First time reference";
 	}
 
-###Comments: /* */ and //
+###Comments：`/* */` and `//`
 * 單行註解`//`：不會被編譯到 CSS  
 * 多行註解`/* */`：會被編譯到 CSS  
 
@@ -133,7 +133,7 @@ When the first letter of a multiline comment is `!`, the comment will always ren
 		color: #bfbfbf
 	}
 
-###Interpolation: #{}
+###Interpolation：`#{}`
 你可以使用`#{}`插值放在 Sass 變數和屬性名
 
 	$name: foo;
@@ -213,7 +213,7 @@ When the first letter of a multiline comment is `!`, the comment will always ren
 		}
 	}
 
-###Referencing Parent Selectors: &
+###Referencing Parent Selectors：`&`
 其中 Sass 提供了一些的功能，在編寫巢狀分佈時可以更方便和快速。`&`表示父選擇器。這意味著，如果你有一個深層嵌套的規則，`&`將可以完全替換。例如：
 
 	a {
@@ -250,7 +250,7 @@ When the first letter of a multiline comment is `!`, the comment will always ren
 		border: 1px solid;
 	}
 
-如果沒有父選擇器，`&`的值就會是 null。這意味著你可以在 mixin 中使用，來檢測是否有父選擇器存在。
+如果沒有父選擇器，`&`的值就會是`null`。這意味著你可以在 mixin 中使用，來檢測是否有父選擇器存在。
 
 	@mixin does-parent-exist {
 	  @if & {
@@ -313,7 +313,7 @@ Sass 所提供的 Opertaors 會因為資料形態的不同而有所差異。其�
 Sass 支援了標準的數學運作(addition `+`, subtraction `-`, multiplication `*`, division `/`, and modulo `%`)。Sass 的數學函數包含了單位，這意味著不同的單位無法混合使用(例如`px`和`em`)。  
 另外也支援了關係運算子 Relational operators (`<`, `>`, `<=`, `>=`)
 
-####Division /
+####Division`/`
 在 CSS 中`/`被用來分隔數字，但在 Sass 中有三種情況`/`可以被用作➗。  
 
 1. 如果值是儲存在變數或是由函數回傳  
@@ -353,7 +353,7 @@ Sass 支援了標準的數學運作(addition `+`, subtraction `-`, multiplicatio
 	  	// A shorthand font-size: 12px; line-height: 30px;
 	}
 
-###Color operators
+###Color Operations
 顏色值的運算會分段處理，這表示會拆分成紅、綠和藍  
 
 	p {
@@ -385,7 +385,7 @@ Sass 支援了標準的數學運作(addition `+`, subtraction `-`, multiplicatio
 	}
 
 ###String Operations
-`+`operation 可以用來串聯字串。其中要注意的是，如果是帶引號的字串開頭，最後會轉成帶引號的字串。如果是不帶引號的字處開頭，則會轉成不帶引號的字串。Null 值會被當作空字串。
+`+`operation 可以用來串聯字串。其中要注意的是，如果是帶引號的字串開頭，最後會轉成帶引號的字串。如果是不帶引號的字處開頭，則會轉成不帶引號的字串。`Null`值會被當作空字串。
 	
 	$value: null;
 	p {

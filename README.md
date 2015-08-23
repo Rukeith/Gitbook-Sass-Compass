@@ -5,9 +5,23 @@ Reference Sass and Compass official website, "Sass and Compass in action" by Wyn
 ##Chapter 1
 1. Basic Syntax
 	* Variables：`$`
-	* Comments: `/* */` and `//`
+		* `!global`
+		* `!default`
+	* Comments：`/* */` and `//`
+	* Interpolation：`#{}`
 2. Nesting
-	* Referencing Parent Selectors: `&`
+	* Referencing Parent Selectors：`&`
 	* Nested Properties
 3. Operations
 	* Number Operations
+		* Division`/` 
+	* Color Operations
+	* String Operations
+	* Boolean Operations
+
+##Chapter 2
+1. Extend / Inheritance
+2. Mixins
+3. Partials
+4. Import
+		
