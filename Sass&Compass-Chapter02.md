@@ -362,17 +362,114 @@ It’s not possible to nest `@import` within mixins or control directives.
 
 
 ###`!optional`標籤
-一般在擴增選擇器食，可能會遇到一些錯誤造成`@extend`不能作用。例如編寫了
+一般在擴增選擇器時，可能會遇到一些錯誤造成`@extend`不能作用。例如編寫了
 
 	a.import {
 		@extend .notice
 	}
 
-但是可能因為沒有選擇器包含了`.notice`，或是包含的是`h1.notice`。
-
-
+但是可能因為沒有選擇器包含了`.notice`，或是包含的是`h1.notice`。為了避免產生矛錯誤的選擇器組合，可以使用`!optional`標籤避免這問題。
 
 ###`@extend` in Directives
+Sass 中`@extend`在 Directives 裡面有些使用上的限制，例如：`@media`。`@extend`只能擴展`@media`內的選擇器
+
+	@media print {
+	  .error {
+	    border: 1px #f00;
+	    background-color: #fdd;
+	  }
+	  .seriousError {
+	    @extend .error;
+	    border-width: 3px;
+	  }
+	}
+
+	// Wrong
+	.error {
+	  border: 1px #f00;
+	  background-color: #fdd;
+	}
+
+	@media print {
+	  .seriousError {
+	    // INVALID EXTEND: .error is used outside of the "@media print" directive
+	    @extend .error;
+	    border-width: 3px;
+	  }
+	}
+
+###`@at-root`
+The `@at-root` directive causes one or more rules to be emitted at the root of the document, rather than being nested beneath their parent selectors. It can either be used with a single inline selector：
+
+	.parent {
+	  ...
+	  @at-root .child { ... }
+	}
+	
+	// CSS
+	.parent { ... }
+	.child { ... }
+
+Or it can be used with a block containing multiple selectors：
+
+	.parent {
+	  ...
+	  @at-root {
+	    .child1 { ... }
+	    .child2 { ... }
+	  }
+	  .step-child { ... }
+	}
+
+	// CSS
+	.parent { ... }
+	.child1 { ... }
+	.child2 { ... }
+	.parent .step-child { ... }
+
+####`@at-root (without: ...)` and `@at-root (with: ...)`
+預設裡`@at-root`只排除選擇器。然而也可以使用`@at-root`在巢狀 directives 的外面，例如：`@media`。
+
+	@media print {
+	  .page {
+	    width: 8in;
+	    @at-root (without: media) {
+	      color: red;
+	    }
+	  }
+	}
+	
+	// CSS
+	@media print {
+	  .page {
+	    width: 8in;
+	  }
+	}
+	.page {
+	  color: red;
+	}
+
+You can use `@at-root (without: ...)` to move outside of any directive. You can also do it with multiple directives separated by a space: `@at-root (without: media supports)` moves outside of both `@media` and `@supports` queries.
+
+There are two special values you can pass to `@at-root`. “rule” refers to normal CSS rules; `@at-root (without: rule)` is the same as `@at-root` with no query. `@at-root (without: all)` means that the styles should be moved outside of *all* directives and CSS rules.
+
+If you want to specify which directives or rules to include, rather than listing which ones should be excluded, you can use `with` instead of `without`. For example, `@at-root (with: rule)` will move outside of all directives, but will preserve any CSS rules.
+
+###`@debug`
+`@debug`directive 會印出 Sass 表達式的值到標準錯誤輸出流。對於除錯複雜的 Sass 文件很有用。
+
+	@debug 10em + 12em;
+	
+	// outputs:
+	Line 1 DEBUG: 22em
+
+###`@warn`
+
+
+
+###`@error`
+
+
 
 ##Control Directives & Expressions
 
