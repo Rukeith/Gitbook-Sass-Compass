@@ -9,9 +9,11 @@ Reference Sass and Compass official website, "Sass and Compass in action" by Wyn
 		* `!default`
 	* Comments：`/* */` and `//`
 	* Interpolation：`#{}`
+
 2. Nesting
 	* Referencing Parent Selectors：`&`
 	* Nested Properties
+
 3. Operations
 	* Number Operations
 		* Division`/` 
@@ -30,6 +32,7 @@ Reference Sass and Compass official website, "Sass and Compass in action" by Wyn
 	* `@debug`
 	* `@warn`
 	* `@error`
+
 2. Control Directives & Expressions
 	* `if()`
 	* `@if`
@@ -37,6 +40,7 @@ Reference Sass and Compass official website, "Sass and Compass in action" by Wyn
 	* `@each`
 		* Multiple Assignment
 	* `@while`
+
 3. Extend / Inheritance
 	* Extending Complex Selectors
 	* Multiple Extends
@@ -47,6 +51,24 @@ Reference Sass and Compass official website, "Sass and Compass in action" by Wyn
 	* `!optional` tag
 	* `@extend` in Directives
 
-4. Mixins
-5. Partials
-6. Import
+4. Mixin
+	* `@mixin`
+	* `@include`
+	* Arguments
+		* Keyword Arguments
+		* Variable Arguments
+	* Passing Content Block to a Mixin
+		* Variable Scope and Content Blocks
+
+5. Function Directives
+
+6. Output Style
+	* `:nested`
+	* `:expanded`
+	* `:compact`
+	* `:compressed`
+
+7. Extending Sass
+	* Defining Custom Sass Functions
+	* Cache Stores
+	* Custom Importers

@@ -654,18 +654,28 @@ Sass 中`@extend`在 Directives 裡面有些使用上的限制，例如：`@medi
 	  }
 	}
 
-##Mixins
-有時候 CSS 中會有一些重複的部分需要編寫，尤其是 CSS3 中存在許多的前綴詞。Mixin 會讓你設置一個群組讓你可以重複使用。你可以套過這個傳遞參數來製作更為彈性的設定。
+##Mixin
+Mixin 允許使用者可以定義樣式使其被重新用於整個樣式表，而無需使用非語義 classes 像是 `.float-left`。甚至可以帶參數，使用極少的 mixin 生產各種樣式。尤其在於不同瀏覽器需要多種的樣式前綴詞。
 
-可以使用`@mixin`來建立 mixin 並設定名稱，然後使用`@include`來導入 mixin 使用。
+###`@mixin`
+使用`@mixin`來定義 mixin，並宣告名稱。其中也可以包含各種選擇器和屬性。
 
-	// CSS
-	.box {
-	  -webkit-border-radius: 10px;
-	  -moz-border-radius: 10px;
-	  -ms-border-radius: 10px;
-	  border-radius: 10px;
+	@mixin clearfix {
+	  display: inline-block;
+	  &:after {
+	    content: ".";
+	    display: block;
+	    height: 0;
+	    clear: both;
+	    visibility: hidden;
+	  }
+	  * html & { height: 1px }
 	}
+	
+此外 mixin 的名稱同樣連字號和底線可以互相替代，例如定義一個 mixin 名稱為`add-column`，則可以使用`add_column`呼叫，反之亦然。
+
+###`@include`
+Mixins 使用`@include`來導入到檔案中，可以攜帶參數到 mixins 中。
 
 	// Sass
 	=border-radius($radius)
@@ -676,7 +686,9 @@ Sass 中`@extend`在 Directives 裡面有些使用上的限制，例如：`@medi
 
 	.box
 	  +border-radius(10px)
-	  
+	  padding: 4px;
+  	  margin-top: 10px;
+
 	 // Scss
 	 @mixin border-radius($radius) {
 	  -webkit-border-radius: $radius;
@@ -685,56 +697,118 @@ Sass 中`@extend`在 Directives 裡面有些使用上的限制，例如：`@medi
 	          border-radius: $radius;
 	}
 
-	.box { @include border-radius(10px); }
-
-##Partials
-你可以把 CSS 檔拆分成多個不同的 Sass 檔案，然後導入到別的 Sass 檔案。每個分割 Sass 檔名前頭都需加上底線，例如：`_head.scss`。底線會讓 Sass 知道這檔案是分割檔。其中是使用了 `@import` 來導入。
-
-##Import
-CSS 有可以讓你把 CSS 分割成更小的檔案，可以更好的維護。唯一的缺點是，每當使用`@import`，CSS 就會產生一個 HTTP request。Sass builds on top of the current CSS @import but instead of requiring an HTTP request, Sass will take the file that you want to import and combine it with the file you're importing into so you can serve a single CSS file to the web browser.
-
-	We want to import _reset.scss into base.scss.
+	.box {
+		@include border-radius(10px);
+		padding: 4px;
+	  	margin-top: 10px;
+	}
+	
 	// CSS
-	html, body, ul, ol {
-		margin: 0;
-		padding: 0;
+	.box {
+	  -webkit-border-radius: 10px;
+	  -moz-border-radius: 10px;
+	  -ms-border-radius: 10px;
+	  border-radius: 10px;
+	  padding: 4px;
+	  margin-top: 10px;
+	}
+	
+Mixins 有時候也會導入在外面（文件的頂部），並且不直接定義任何屬性或父選擇器。
+
+	@mixin silly-links {
+	  a {
+	    color: blue;
+	    background-color: red;
+	  }
+	}
+	
+	@include silly-links;
+	
+	// CSS
+	a {
+  		color: blue;
+  		background-color: red;
+  	}
+  	
+Mixin 也可以導入到其他的 Mixins 中。
+
+	@mixin compound {
+	  @include highlighted-background;
+	  @include header-text;
+	}
+	
+	@mixin highlighted-background { background-color: #fc0; }
+	@mixin header-text { font-size: 20px; }
+
+###Arguments
+Mixin 可以使用 Sass 的值當作參數
+
+	@mixin sexy-border($color, $width) {
+	  border: {
+	    color: $color;
+	    width: $width;
+	    style: dashed;
+	  }
+	}
+	
+	p {
+		@include sexy-border(blue, 1in);
+	}
+	
+	// CSS
+	p {
+	  border-color: blue;
+	  border-width: 1in;
+	  border-style: dashed;
 	}
 
-	body {
-		font: 100% Helvetica, sans-serif;
-		background-color: #efefef;
-	}
-		
-	// Sass
-	// _reset.sass
-	html,
-	body,
-	ul,
-	ol
-		margin:  0
-		padding: 0
-		  
-	// base.sass
-	@import reset
+Mixins 也可以對參數設定預設值。當導入 mixin 時，若沒有傳送參數，則會用預設值代替。
 
-	body
-		font: 100% Helvetica, sans-serif
-		background-color: #efefef
-		
-	// Scss
-	// _reset.scss
-	html,
-	body,
-	ul,
-	ol {
-		margin: 0;
-		padding: 0;
+	@mixin sexy-border($color, $width: 1in) {
+	  border: {
+	    color: $color;
+	    width: $width;
+	    style: dashed;
+	  }
 	}
-		
-	/* base.scss */
-	@import 'reset';
+	p { @include sexy-border(blue); }
+	h1 { @include sexy-border(blue, 2in); }
+	
+	// CSS
+	p {
+	  border-color: blue;
+	  border-width: 1in;
+	  border-style: dashed;
+	}
+	
+	h1 {
+	  border-color: blue;
+	  border-width: 2in;
+	  border-style: dashed;
+	}
 
-	body {
-		font: 100% Helvetica, sans-serif;
-		background-color: #efefef;
-	}
+####Keyword Arguments
+在傳遞參數時，可以明確的指定是要傳送哪個變數
+
+	p { @include sexy-border($color: blue); }
+	h1 { @include sexy-border($color: blue, $width: 2in); }
+
+雖然這種用法較簡明，它可以使樣式表更容易閱讀。它也使得函式呈現更加彈性，提供了許多參數。參數可以以任何順序進行傳遞，並可以省略有預設值的參數。而且參數名，同樣的連字號和底線可以互換。
+
+####Variable Arguments
+
+###Passing Content Block to a Mixin
+####Variable Scope and Content Blocks
+
+##Function Directives
+
+##Output Style
+###`:nested`
+###`:expanded `
+###`:compact `
+###`:compressed `
+
+##Extending Sass
+###Defining Custom Sass Functions
+###Cache Stores
+###Custom Importers
