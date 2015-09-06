@@ -19,9 +19,34 @@ Reference Sass and Compass official website, "Sass and Compass in action" by Wyn
 	* String Operations
 	* Boolean Operations
 
-##Chapter 2
-1. Extend / Inheritance
-2. Mixins
-3. Partials
-4. Import
-		
+##Chapter 2 - Advanced Usage
+1. @-Rules and Directives
+	* `@import`
+		* 	Partials
+		*  Nested `@import`
+	* `@media`
+	* `@at-root`
+		* 	without and with
+	* `@debug`
+	* `@warn`
+	* `@error`
+2. Control Directives & Expressions
+	* `if()`
+	* `@if`
+	* `@for`
+	* `@each`
+		* Multiple Assignment
+	* `@while`
+3. Extend / Inheritance
+	* Extending Complex Selectors
+	* Multiple Extends
+	* Chaining Extends
+	* Selector Sequences
+		* Merging Selector Sequences
+	* `@extend`-only Selectors
+	* `!optional` tag
+	* `@extend` in Directives
+
+4. Mixins
+5. Partials
+6. Import

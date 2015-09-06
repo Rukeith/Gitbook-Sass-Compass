@@ -3,7 +3,8 @@
 Sass 支援所有 CSS3 的 @-rules，以及提供額外的 Sass 功能被稱為 **directives**。這些還可以被區分為 **control directives** 和 **mixin directives**。
 
 ###`@import`
-Sass 擴增了 CSS 的`@import`功能，使其也能導入 Sass 檔案。所有被導入的 Sass 檔案會整合成單一個 CSS 檔案中。其中在分割檔內定義的變數和 mixins 也能在主要檔案中使用。
+Sass 擴增了 CSS 的`@import`功能，使其也能導入 Sass 檔案。所有被導入的 Sass 檔案會整合成單一個 CSS 檔案中。其中在分割檔內定義的變數和 mixins 也能在主要檔案中使用。  
+
 `@import`一般會直接導入 Sass 檔案，在某些情況下才會被當作 CSS 的`@import`使用：
 
 * If the file’s extension is `.css`.
@@ -12,6 +13,7 @@ Sass 擴增了 CSS 的`@import`功能，使其也能導入 Sass 檔案。所有�
 * If the `@import` has any media queries.
 
 如果導入的名字沒有 .scss 或 .sass，Sass 會自動尋找有此名字的 sass 檔案。其中也可以用單ㄧ行導入多個檔案  
+
 `@import "rounded-corners", "text-shadow";`
 
 例外要注意的是，`@import`無法使用`#{}`，除非是當作 CSS 的`@import`來使用。
@@ -26,6 +28,7 @@ Sass 擴增了 CSS 的`@import`功能，使其也能導入 Sass 檔案。所有�
 如果你想要導入 Sass 檔案，但不想要編譯成 CSS，你可以在檔名前加上底線。這會告訴 Sass 不要編譯成 CSS 檔案。然後導入這些檔案時就可以忽略底線
 
 例如，有一個檔案`_color.scss`，所以不會有`_color.css`檔案生成，所以可以寫以下來導入  
+
 `@import "colors";`  
 
 這將會導入`_color.scss`。要注意到的是，同一資料夾底下不能同時有`_color.scss`和`color.scss`的檔案。
@@ -38,6 +41,7 @@ Sass 擴增了 CSS 的`@import`功能，使其也能導入 Sass 檔案。所有�
 	.example {
 	  color: red;
 	}
+	
 然後
 
 	#main {
@@ -48,6 +52,7 @@ Sass 擴增了 CSS 的`@import`功能，使其也能導入 Sass 檔案。所有�
 	#main .example {
 	  color: red;
 	}
+
 Directives that are only allowed at the base level of a document, like `@mixin` or `@charset`, are not allowed in files that are `@import`ed in a nested context.
 
 It’s not possible to nest `@import` within mixins or control directives.
@@ -109,11 +114,262 @@ It’s not possible to nest `@import` within mixins or control directives.
 	}
 
 ###`@at-root`
-####without and with
+The `@at-root` directive causes one or more rules to be emitted at the root of the document, rather than being nested beneath their parent selectors. It can either be used with a single inline selector：
+
+    .parent {
+      ...
+      @at-root .child { ... }
+    }
+    
+    // CSS
+    .parent { ... }
+    .child { ... }
+
+Or it can be used with a block containing multiple selectors：
+
+    .parent {
+      ...
+      @at-root {
+        .child1 { ... }
+        .child2 { ... }
+      }
+      .step-child { ... }
+    }
+
+    // CSS
+    .parent { ... }
+    .child1 { ... }
+    .child2 { ... }
+    .parent .step-child { ... }
+
+####`@at-root (without: ...)` and `@at-root (with: ...)`
+預設裡`@at-root`只排除選擇器。然而也可以使用`@at-root`在巢狀 directives 的外面，例如：`@media`。
+
+    @media print {
+      .page {
+        width: 8in;
+        @at-root (without: media) {
+          color: red;
+        }
+      }
+    }
+    
+    // CSS
+    @media print {
+      .page {
+        width: 8in;
+      }
+    }
+    .page {
+      color: red;
+    }
+
+You can use `@at-root (without: ...)` to move outside of any directive. You can also do it with multiple directives separated by a space: `@at-root (without: media supports)` moves outside of both `@media` and `@supports` queries.
+
+There are two special values you can pass to `@at-root`. “rule” refers to normal CSS rules; `@at-root (without: rule)` is the same as `@at-root` with no query. `@at-root (without: all)` means that the styles should be moved outside of *all* directives and CSS rules.
+
+If you want to specify which directives or rules to include, rather than listing which ones should be excluded, you can use `with` instead of `without`. For example, `@at-root (with: rule)` will move outside of all directives, but will preserve any CSS rules.
 
 ###`@debug`
+`@debug`directive 會印出 Sass 表達式的值到標準錯誤輸出流。對於除錯複雜的 Sass 文件很有用。
+
+    @debug 10em + 12em;
+    
+    // outputs:
+    Line 1 DEBUG: 22em
+
 ###`@warn`
+`@warn`directive 會印出 Sass 表達式的值到標準錯誤輸出流。這對於那些需要提醒無用的使用者是有用的。`@warn`和`@debug`有兩項主要的差別：
+
+1. 可以使用了`--quiet`命令或是`:quite`Sass選項，則可以關掉`@warn`
+2. 樣式表將會印出訊息，則可以警告使用樣式表造成的警告
+
+        @mixin adjust-location($x, $y) {
+          @if unitless($x) {
+            @warn "Assuming #{$x} to be in pixels";
+            $x: 1px * $x;
+          }
+          @if unitless($y) {
+            @warn "Assuming #{$y} to be in pixels";
+            $y: 1px * $y;
+          }
+          position: relative; left: $x; top: $y;
+        }
+
 ###`@error`
+`@warn`directive 會印出 Sass 表達式的值作為一個致命錯誤。用於驗證參數的mixins和函示非常有用。
+
+    @mixin adjust-location($x, $y) {
+      @if unitless($x) {
+        @error "$x may not be unitless, was #{$x}.";
+      }
+      @if unitless($y) {
+        @error "$y may not be unitless, was #{$y}.";
+      }
+      position: relative; left: $x; top: $y;
+    }
+
+##Control Directives & Expressions
+Sass 提供了基本的控制 directives 和 expressions，支持樣式在一定的條件或使用變數導入相同的樣式。它主要是用於 mixins，特別是那些像 Compass，需要大量的靈活性。
+
+###`if()`
+`if()`可以使用在樣式表中的任何位置。
+
+    if(true, 1px, 2px) => 1px
+    if(false, 1px, 2px) => 2px
+
+###`@if`
+需要使用在巢狀結構下，並且使用 Sass 表達式。否則會回傳 false 或 null
+
+    p {
+      @if 1 + 1 == 2 { border: 1px solid;  }
+      @if 5 < 3      { border: 2px dotted; }
+      @if null       { border: 3px double; }
+    }
+    
+    // CSS
+    p {
+      border: 1px solid;
+    }
+
+`@if`也可以接續數個`@else if`或一個`@else`
+
+    $type: monster;
+    p {
+      @if $type == ocean {
+        color: blue;
+      } @else if $type == matador {
+        color: red;
+      } @else if $type == monster {
+        color: green;
+      } @else {
+        color: black;
+      }
+    }
+
+    // CSS
+    p {
+      color: green;
+    }
+
+###`@for`
+會重複一系列的樣式。每次重複，計數器變量用於調整輸出。Directive 有兩種格式`@for $var from <start> through <end>`和`@for $var from <start> to <end>`。 
+要注意的是，關鍵字`through`和`to`。`$var`可以是任何的變數，像是`$fi`。`<start>`和`<end>`是 Sass 表達式，所以應該回傳整數。當`<start>`大於`<end>`，則計數器將會遞減而非遞增。
+
+`@for`設定`$var`為特定範圍內的數值，且每次輸出巢狀樣式都使用`$var`的值。`from ... through`格式的範圍包含了`<start>`和`<end>`的值。但是`from ... to`則不會包含`<end>`的值。
+
+    @for $i from 1 through 3 {
+      .item-#{$i} { width: 2em * $i; }
+    }
+
+    // CSS
+    .item-1 {
+      width: 2em;
+    }
+    .item-2 {
+      width: 4em;
+    }
+    .item-3 {
+      width: 6em;
+    }
+
+
+###`@each`
+`@each`directive 通常使用`@each $var in <list or map>`格式。`$var`可是任何變數名，像是`$length`或是`$name`。並且`<list or map>`是 Sass 表達式，會回傳 list 或 map。  
+`@each`設定`$var`為 list 或 map 中的每個項目，且輸出了`$var`的值為樣式。
+
+    @each $animal in puma, sea-slug, egret, salamander {
+      .#{$animal}-icon {
+        background-image: url('/images/#{$animal}.png');
+      }
+    }
+    
+    // CSS
+    .puma-icon {
+      background-image: url('/images/puma.png');
+    }
+    .sea-slug-icon {
+      background-image: url('/images/sea-slug.png');
+    }
+    .egret-icon {
+      background-image: url('/images/egret.png');
+    }
+    .salamander-icon {
+      background-image: url('/images/salamander.png');
+    }
+
+####Multiple Assignment
+`@each`也可以使用多項變數，例如：`@each $var1, $var2,... in <list>`。如果`<list>`是 lists 中的 list，則每個 sub-list 會被指定為個別的變數。
+
+    @each $animal, $color, $cursor in (puma, black, default),
+                                      (sea-slug, blue, pointer),
+                                      (egret, white, move) {
+      .#{$animal}-icon {
+        background-image: url('/images/#{$animal}.png');
+        border: 2px solid $color;
+        cursor: $cursor;
+      }
+    }
+
+    // CSS
+    .puma-icon {
+      background-image: url('/images/puma.png');
+      border: 2px solid black;
+      cursor: default;  
+    }
+    .sea-slug-icon {
+      background-image: url('/images/sea-slug.png');
+      border: 2px solid blue;
+      cursor: pointer;
+    }
+    .egret-icon {
+      background-image: url('/images/egret.png');
+      border: 2px solid white;
+      cursor: move;
+    }
+
+maps 可以被視為對應清單，也可以用於多比參數。
+
+    @each $header, $size in (h1: 2em, h2: 1.5em, h3: 1.2em) {
+      #{$header} {
+        font-size: $size;
+      }
+    }
+    
+    // CSS
+    h1 {
+      font-size: 2em;
+    }
+    h2 {
+      font-size: 1.5em;
+    }
+    h3 {
+      font-size: 1.2em;
+    }
+
+###`@while`
+`@while`directive 會一直重複輸出巢狀樣式，直到判斷值變為 false。這可以比`@for`使用更複雜的迴圈，雖然大多很少是必須使用。
+
+    $i: 6;
+    @while $i > 0 {
+      .item-#{$i} { 
+        width: 2em * $i;
+      }
+      $i: $i - 2;
+    }
+
+    // CSS
+    .item-6 {
+      width: 12em;
+    }
+    
+    .item-4 {
+      width: 8em;
+    }
+    
+    .item-2 {
+      width: 4em;
+    }
 
 ##Extend / Inheritance
 `@extend`是 Sass 中最常被使用到的功能，它可以讓某選擇器繼承另一個選擇器所擁有的 CSS 設定。
@@ -397,88 +653,6 @@ Sass 中`@extend`在 Directives 裡面有些使用上的限制，例如：`@medi
 	    border-width: 3px;
 	  }
 	}
-
-###`@at-root`
-The `@at-root` directive causes one or more rules to be emitted at the root of the document, rather than being nested beneath their parent selectors. It can either be used with a single inline selector：
-
-	.parent {
-	  ...
-	  @at-root .child { ... }
-	}
-	
-	// CSS
-	.parent { ... }
-	.child { ... }
-
-Or it can be used with a block containing multiple selectors：
-
-	.parent {
-	  ...
-	  @at-root {
-	    .child1 { ... }
-	    .child2 { ... }
-	  }
-	  .step-child { ... }
-	}
-
-	// CSS
-	.parent { ... }
-	.child1 { ... }
-	.child2 { ... }
-	.parent .step-child { ... }
-
-####`@at-root (without: ...)` and `@at-root (with: ...)`
-預設裡`@at-root`只排除選擇器。然而也可以使用`@at-root`在巢狀 directives 的外面，例如：`@media`。
-
-	@media print {
-	  .page {
-	    width: 8in;
-	    @at-root (without: media) {
-	      color: red;
-	    }
-	  }
-	}
-	
-	// CSS
-	@media print {
-	  .page {
-	    width: 8in;
-	  }
-	}
-	.page {
-	  color: red;
-	}
-
-You can use `@at-root (without: ...)` to move outside of any directive. You can also do it with multiple directives separated by a space: `@at-root (without: media supports)` moves outside of both `@media` and `@supports` queries.
-
-There are two special values you can pass to `@at-root`. “rule” refers to normal CSS rules; `@at-root (without: rule)` is the same as `@at-root` with no query. `@at-root (without: all)` means that the styles should be moved outside of *all* directives and CSS rules.
-
-If you want to specify which directives or rules to include, rather than listing which ones should be excluded, you can use `with` instead of `without`. For example, `@at-root (with: rule)` will move outside of all directives, but will preserve any CSS rules.
-
-###`@debug`
-`@debug`directive 會印出 Sass 表達式的值到標準錯誤輸出流。對於除錯複雜的 Sass 文件很有用。
-
-	@debug 10em + 12em;
-	
-	// outputs:
-	Line 1 DEBUG: 22em
-
-###`@warn`
-
-
-
-###`@error`
-
-
-
-##Control Directives & Expressions
-
-###`if()`
-###`@if`
-###`@for`
-###`@each`
-####Multiple Assignment
-###`@while`
 
 ##Mixins
 有時候 CSS 中會有一些重複的部分需要編寫，尤其是 CSS3 中存在許多的前綴詞。Mixin 會讓你設置一個群組讓你可以重複使用。你可以套過這個傳遞參數來製作更為彈性的設定。
