@@ -796,19 +796,199 @@ Mixins 也可以對參數設定預設值。當導入 mixin 時，若沒有傳送
 雖然這種用法較簡明，它可以使樣式表更容易閱讀。它也使得函式呈現更加彈性，提供了許多參數。參數可以以任何順序進行傳遞，並可以省略有預設值的參數。而且參數名，同樣的連字號和底線可以互換。
 
 ####Variable Arguments
+有的時候 mixin 或函式會不確定參數的數量，例如當要建立 box 的陰影時，並不確定陰影參數的數量。Sass 提供了**variable arguments**，在 mixin 或函式的最後宣告所以的變數，並且包裹成列表。看起來就像是一般的參數，可是後面接著`...`。
+
+	@mixin box-shadow($shadows...) {
+	  -moz-box-shadow: $shadows;
+	  -webkit-box-shadow: $shadows;
+	  box-shadow: $shadows;
+	}
+	
+	.shadows {
+	  @include box-shadow(0px 4px 5px #666, 2px 6px 10px #999);
+	}
+
+	// CSS
+	.shadows {
+	  -moz-box-shadow: 0px 4px 5px #666, 2px 6px 10px #999;
+	  -webkit-box-shadow: 0px 4px 5px #666, 2px 6px 10px #999;
+	  box-shadow: 0px 4px 5px #666, 2px 6px 10px #999;
+	}
+
+Variable arguments also contain any keyword arguments passed to the mixin or function. These can be accessed using the `keywords($args) function`, which returns them as a map from strings (without `$`) to values.
+
+可變參數也可以在呼叫 mixin 時使用。同樣的語法下，也可以把列表中每個值當作個別的參數，或是映射各個值當作關鍵字參數。
+
+	@mixin colors($text, $background, $border) {
+	  color: $text;
+	  background-color: $background;
+	  border-color: $border;
+	}
+	
+	$values: #ff0000, #00ff00, #0000ff;
+	.primary {
+	  @include colors($values...);
+	}
+	
+	$value-map: (text: #00ff00, background: #0000ff, border: #ff0000);
+	.secondary {
+	  @include colors($value-map...);
+	}
+	
+	// CSS
+	.primary {
+	  color: #ff0000;
+	  background-color: #00ff00;
+	  border-color: #0000ff;
+	}
+	
+	.secondary {
+	  color: #00ff00;
+	  background-color: #0000ff;
+	  border-color: #ff0000;
+	}
+	
+可以使用 variable arguments 來包裹 mixin 並添加額外的樣式，而不需要改變 mixin 的參數命名。
+
+	@mixin wrapped-stylish-mixin($args...) {
+	  font-weight: bold;
+	  @include stylish-mixin($args...);
+	}
+	
+	.stylish {
+	  // The $width argument will get passed on to "stylish-mixin" as a keyword
+	  @include wrapped-stylish-mixin(#00ff00, $width: 100px);
+	}
 
 ###Passing Content Block to a Mixin
+某些情況下，也有可能傳遞一區塊的樣式給 mixin，其樣式會出現在 mixin 中的任何的`@content`位置。這使得可以定義與選擇器和指令的結構的抽象。
+
+	// Scss
+	@mixin apply-to-ie6-only {
+	  * html {
+	    @content;
+	  }
+	}
+	@include apply-to-ie6-only {
+	  #logo {
+	    background-image: url(/logo.gif);
+	  }
+	}
+	
+	// Sass
+	=apply-to-ie6-only
+	  * html
+	    @content
+	
+	+apply-to-ie6-only
+	  #logo
+	    background-image: url(/logo.gif)
+	
+	// CSS
+	* html #logo {
+	  background-image: url(/logo.gif);
+	}
+
+>Note：當`@content`調用不只一次或是迴圈，則樣式區塊將會在每次條用時複製
+
 ####Variable Scope and Content Blocks
+The block of content passed to a mixin are evaluated in the scope where the block is defined, not in the scope of the mixin. This means that variables local to the mixin cannot be used within the passed style block and variables will resolve to the global value:
+
+	$color: white;
+	@mixin colors($color: blue) {
+	  background-color: $color;
+	  @content;
+	  border-color: $color;
+	}
+	.colors {
+	  @include colors { color: $color; }
+	}
+
+	// CSS
+	.colors {
+	  background-color: blue;
+	  color: white;
+	  border-color: blue;
+	}
+
+Additionally, this makes it clear that the variables and mixins that are used within the passed block are related to the other styles around where the block is defined. For example:
+
+	#sidebar {
+	  $sidebar-width: 300px;
+	  width: $sidebar-width;
+	  @include smartphone {
+	    width: $sidebar-width / 3;
+	  }
+	}
 
 ##Function Directives
+在 Sass 中也可以定義自己的函式，並且使用其中的任何值和內容。
+
+	$grid-width: 40px;
+	$gutter-width: 10px;
+	
+	@function grid-width($n) {
+	  @return $n * $grid-width + ($n - 1) * $gutter-width;
+	}
+	
+	#sidebar { width: grid-width(5); }
+	
+	// CSS
+	#sidebar {
+	  width: 240px;
+	}
+
+如你所見的，函式可以如 mixin 一般接收任何全域變數當作參數。要注意的是，一定要使用`@return`來設定函式的回傳值。與 mixins 一樣，也可以配合使用 keyword arguments 和 variable arguments。並且連字號和底線也支援互換。上面的範例可以修改成以下來呼叫函式：
+
+`#sidebar { width: grid-width($n: 5); }`
+
+在此建議可以在你的函式加上前綴詞，以避免命名衝突，閱讀上不會誤解為部分的 Sass 或 CSS。
 
 ##Output Style
-###`:nested`
-###`:expanded `
-###`:compact `
-###`:compressed `
+雖然 Sass 預設輸出的 CSS 樣式相當好，且反應了文檔結構。不過 Sass 也提供了多種的輸出樣式。Sass 提供了四種不同的輸出樣式，設定`:style`選項或是使用`--style`指令。
 
-##Extending Sass
-###Defining Custom Sass Functions
-###Cache Stores
-###Custom Importers
+###`:nested`
+巢狀樣式是 Sass 的預設樣式，因為反映了 CSS 樣式和 HTML 結構。每個屬性都在新的一行，並且會如同結構般的縮排。
+
+	#main {
+	  color: #fff;
+	  background-color: #000; }
+	  #main p {
+	    width: 10em; }
+	
+	.huge {
+	  font-size: 10em;
+	  font-weight: bold;
+	  text-decoration: underline; }
+	  
+巢狀樣式非常適合閱讀龐大的 CSS 檔案，可以很容易地知道檔案結構
+
+###`:expanded`
+相比下擴大樣式則是一種典型的 CSS 樣式。每個條件都不會有結構般的縮排。
+
+	#main {
+	  color: #fff;
+	  background-color: #000;
+	}
+	#main p {
+	  width: 10em;
+	}
+	
+	.huge {
+	  font-size: 10em;
+	  font-weight: bold;
+	  text-decoration: underline;
+	}
+
+###`:compact`
+緊湊樣式相比巢狀樣式和擴大樣式，使用了更少的空間。也更注重於選擇器而非屬性。每個 CSS 條件只列在一行內，所有的屬性都宣告在同一行。巢狀條件會緊貼在下一行，不同族群的條件中間則會隔一新行。
+
+	#main { color: #fff; background-color: #000; }
+	#main p { width: 10em; }
+	
+	.huge { font-size: 10em; font-weight: bold; text-decoration: underline; }
+
+###`:compressed`
+壓縮樣式則會盡可能最小化空間，不會有無意義空白和空行。此樣式不適合閱讀
+
+`#main{color:#fff;background-color:#000}#main p{width:10em}.huge{font-size:10em;font-weight:bold;text-decoration:underline}`

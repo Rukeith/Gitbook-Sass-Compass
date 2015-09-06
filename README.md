@@ -67,8 +67,3 @@ Reference Sass and Compass official website, "Sass and Compass in action" by Wyn
 	* `:expanded`
 	* `:compact`
 	* `:compressed`
-
-7. Extending Sass
-	* Defining Custom Sass Functions
-	* Cache Stores
-	* Custom Importers
