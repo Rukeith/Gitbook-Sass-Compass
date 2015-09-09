@@ -1,0 +1,10 @@
+@mixin firefox-message($selector, $message) {
+    #{$selector}:before {
+        content: $message;
+    }
+}
+
+$firefox-greeting: "Hi Firefox users! This is a....";
+$mainColour: #631;
+$h1Size: 4em;
+$removemargin: -20px;

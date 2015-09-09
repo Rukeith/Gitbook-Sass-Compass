@@ -1,5 +1,12 @@
 #Sass & Compass - Basic Usage
-Sass (Syntactically Awesome StyleSheets) - Sass is an extension of CSS that adds power and elegance to the basic language.  
+Sass (Syntactically Awesome StyleSheets) - Sass is an extension of CSS that adds power and elegance to the basic language.
+
+當在使用 Sass 建議你在心裡記住三個原則：(1)
+
+* **Follow the KISS principle：**不要編寫過於複雜的樣式。Sass 可以讓你產生非常複雜的功能，但是如果太過複雜時，那可能就需要好好重新想想你的樣式了。
+* **Sass is just an extension of CSS：**不要妄想一次就改變一切，這並沒有任何好處。只要你能把基本的編譯過程建立在正確的來源或目標文件，那你就完成了工作的一大半了。
+* **Automate or reuse whenever you work with Sass：**配合一些工作，像是 Grunt, Compass, Sass 等等，能幫你完成一大半的工作。
+  
 Sass 提供兩種的 syntax 格式，`Sass`和`Scss`。其寫法差異在於有無括號和分號。
 
 	// Sass

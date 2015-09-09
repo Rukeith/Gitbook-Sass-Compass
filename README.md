@@ -1,6 +1,13 @@
 # Sass-Compass-Note
 This are notes about Sass and Compass which are writed by Rukeith  
-Reference Sass and Compass official website, "Sass and Compass in action" by Wynn Netherland and "Sass and Compass for Designers" by Ben Frain  
+Reference Sass official website,  
+-- "Sass Essentials" by Alex Libby
+-- "Sass and Compass in action" by Wynn Netherland,
+-- "Sass and Compass for Designers" by Ben Frain  
+
+##Install Sass
+If you want to use Sass, you can go to this website to install Sass on your computer [Install Sass](http://sass-lang.com/install)。
+
 
 ##Chapter 1
 1. Basic Syntax
