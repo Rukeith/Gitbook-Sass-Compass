@@ -121,7 +121,7 @@ Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名
 	  color: green;
 	}
 
-When the first letter of a multiline comment is `!`, the comment will always rendered into css output even in compressed output modes. This is useful for adding Copyright notices to your generated CSS.  
+若多行註解的第一個字元為「!」，壓縮過後依舊會照本宣科，適用於宣告版權。
 
 	/*! I am loud; hear me roar */
 	#main {
