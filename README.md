@@ -69,7 +69,9 @@ If you want to use Sass, you can go to this website to install Sass on your comp
 
 5. Function Directives
 
-6. Output Style
+6. 範例
+
+7. Output Style
 	* `:nested`
 	* `:expanded`
 	* `:compact`
