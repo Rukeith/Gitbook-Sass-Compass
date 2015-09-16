@@ -23,7 +23,7 @@ Sass 提供兩種的 syntax 格式，`Sass`和`Scss`。其寫法差異在於有�
 ##Basic Syntax
 ###Variables：`$`
 Sass 提供了宣告變數的功能，可以宣告變數，儲存各種會重複使用的屬性值，例如：顏色、字體或長寬度。  
-Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名包含了多種的特殊字元，例如了底線和破折號。值得一提的是，變數名中底線和破折號是可以互換的。例如宣告了變數`$main-width`可以用`$main_width`來呼叫，反之亦然。
+Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名包含了多種的特殊字元，例如了底線和破折號。**值得一提的是，變數名中底線和破折號是可以互換的**。例如宣告了變數`$main-width`可以用`$main_width`來呼叫，反之亦然。
 
 	// CSS
 	body {
@@ -49,7 +49,29 @@ Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名
 	}
 
 ####`!global`
-如果把變數宣告在巢狀的內部，則只有此選擇器的內部可以使用到此變數。可以額外加上`!global`標籤，使其變成全域皆可使用。
+Sass 的變數是有作用範圍的，如果把變數宣告在選擇器的內部，則只有此選擇器的內部可以使用到此變數。
+
+	$primaryColor: #eeccff;
+	
+	body {
+	  $primaryColor: #ccc;
+	  background: $primaryColor;
+	}
+	
+	p {
+	  color: $primaryColor;
+	}
+	
+	// CSS
+	body {
+		background: #ccc;
+	}
+
+	p {
+		color: #eeccff;
+	}
+	
+但是可以加上`!global`標籤，使其變數可以在全域範圍中使用。
 
 	#main {
 	  $width: 5em !global;
@@ -70,7 +92,7 @@ Sass 的變數宣告，使用`$`放在開頭，後面接上變數名。變數名
 	}
 	
 ####`!default`
-可以使用`!default`來設定變數的預設值，當此變數在任何有被設定過值，則預設值無效。若變數沒有被設定過值，或是值為`null`，則變數的值為預設。
+另外可以使用`!default`來設定變數的預設值。當此變數不論在什麼地方有被設定過值，則預設值無效。若變數沒有被設定過值，或是值為`null`，則變數的值為預設。
 
 	$content: "First content";
 	$content: "Second content?" !default;
@@ -316,12 +338,24 @@ Sass 支援了七種主要的資料型態
 
 Sass 所提供的 Opertaors 會因為資料形態的不同而有所差異。其中`==`和`!=`則是通用的Operators。
 
+其中提供的 operators 如下：
+
+* `+` Addition
+* `–` Subtraction
+* `/` Division
+* `*` Multiplication
+* `%` Modulo
+* `==`Equality
+* `!=`Inequality
+
 ###Number Operations
-Sass 支援了標準的數學運作(addition `+`, subtraction `-`, multiplication `*`, division `/`, and modulo `%`)。Sass 的數學函數包含了單位，這意味著不同的單位無法混合使用(例如`px`和`em`)。  
-另外也支援了關係運算子 Relational operators (`<`, `>`, `<=`, `>=`)
+Sass 的數學函數包含了單位，這意味著不同的單位無法混合使用(例如`px`和`em`)。  
+另外也支援了關係運算子 Relational operators (`<`, `>`, `<=`, `>=`)。當然 CSS 提供的數學函式還是可以使用，例如：`calc`。
 
 ####Division`/`
 在 CSS 中`/`被用來分隔數字，但在 Sass 中有三種情況`/`可以被用作➗。  
+
+**Tip：**  
 
 1. 如果值是儲存在變數或是由函數回傳  
 2. 如果值是被括號包住的  

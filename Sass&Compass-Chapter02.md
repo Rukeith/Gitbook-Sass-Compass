@@ -25,7 +25,7 @@ Sass 擴增了 CSS 的`@import`功能，使其也能導入 Sass 檔案。所有�
 	@import url("http://fonts.googleapis.com/css?family=Droid+Sans");
 	
 ####Partials
-如果你想要導入 Sass 檔案，但不想要編譯成 CSS，你可以在檔名前加上底線。這會告訴 Sass 不要編譯成 CSS 檔案。然後導入這些檔案時就可以忽略底線
+如果你想要導入 Sass 檔案，都編譯到主要的 CSS 檔，但不想要在個別編譯成 CSS。你可以在檔名前加上**底線**，這會告訴 Sass 不要編譯成 CSS 檔案。在導入這些檔案時可以忽略底線。
 
 例如，有一個檔案`_color.scss`，所以不會有`_color.css`檔案生成，所以可以寫以下來導入  
 
@@ -114,18 +114,8 @@ It’s not possible to nest `@import` within mixins or control directives.
 	}
 
 ###`@at-root`
-The `@at-root` directive causes one or more rules to be emitted at the root of the document, rather than being nested beneath their parent selectors. It can either be used with a single inline selector：
-
-    .parent {
-      ...
-      @at-root .child { ... }
-    }
-    
-    // CSS
-    .parent { ... }
-    .child { ... }
-
-Or it can be used with a block containing multiple selectors：
+在巢狀結構中，有時候雖然結構上是包含在父選擇器內，但是 CSS 的樣式寫法上卻不希望鎖定在父選擇器內。這時 Sass 可以使用`@at-root`幫你解決這個問題。
+The `@at-root` directive causes one or more rules to be emitted at the root of the document, rather than being nested beneath their parent selectors.
 
     .parent {
       ...
@@ -655,7 +645,7 @@ Sass 中`@extend`在 Directives 裡面有些使用上的限制，例如：`@medi
 	}
 
 ##Mixin
-Mixin 允許使用者可以定義樣式使其被重新用於整個樣式表，而無需使用非語義 classes 像是 `.float-left`。甚至可以帶參數，使用極少的 mixin 生產各種樣式。尤其在於不同瀏覽器需要多種的樣式前綴詞。
+Mixin 允許使用者可以定義樣式使其被重新用於整個樣式表，而無需使用非語義 classes 像是 `.float-left`。甚至可以帶參數，使用極少的 mixin 生產各種樣式。尤其在於不同瀏覽器需要多種的樣式前綴詞。使用上與`@extend`同樣，只是更加支援了可以傳入參數
 
 ###`@mixin`
 使用`@mixin`來定義 mixin，並宣告名稱。其中也可以包含各種選擇器和屬性。
@@ -889,6 +879,33 @@ Variable arguments also contain any keyword arguments passed to the mixin or fun
 	  background-image: url(/logo.gif);
 	}
 
+ex2. 
+
+	@mixin media($queryString){
+	    @media #{$queryString} {
+	      @content;
+	    }
+	}
+	
+	.container {
+	    width: 900px;
+	    @include media("(max-width: 767px)"){
+	        width: 100%;
+	    }
+	}
+	
+	// CSS
+	.container {
+	  width: 900px;
+	}
+	@media (max-width: 767px) {
+	  .container {
+	    width: 100%;
+	  }
+	}
+
+
+
 >Note：當`@content`調用不只一次或是迴圈，則樣式區塊將會在每次條用時複製
 
 ####Variable Scope and Content Blocks
@@ -943,6 +960,332 @@ Additionally, this makes it clear that the variables and mixins that are used wi
 `#sidebar { width: grid-width($n: 5); }`
 
 在此建議可以在你的函式加上前綴詞，以避免命名衝突，閱讀上不會誤解為部分的 Sass 或 CSS。
+
+##範例：
+	$settings: (
+	    maxWidth: 800px,
+	    columns: 12,
+	    margin: 15px,
+	    breakpoints: (
+	        xs: "(max-width : 480px)",
+	        sm: "(max-width : 768px) and (min-width: 481px)",
+	        md: "(max-width : 1024px)  and (min-width: 769px)",
+	        lg: "(min-width : 1025px)"
+	    )   
+	);
+	
+	@mixin renderGridStyles($settings){
+	  .container {
+	    padding-right: map-get($settings, "margin");
+	    padding-left: map-get($settings, "margin");
+	    margin-right: auto;
+	    margin-left: auto;
+	    max-width: map-get($settings,"maxWidth");
+	  }
+	  
+	  .row {
+	    margin-right: map-get($settings, "margin") * -1;
+	    margin-left: map-get($settings, "margin") * -1;
+	  }
+	  $breakpoints: map-get($settings, "breakpoints");
+	  @each $key, $breakpoint in $breakpoints {
+	    @include media($breakpoint) {
+	      @include renderGrid($key, $settings);
+	    }
+	  }
+	}
+	
+	@mixin renderGrid($key, $settings) {
+	  $i: 1;
+	  @while $i <= map-get($settings, "columns") {
+	    .col-#{$key}-#{$i} {
+	      float: left;
+	      width: 100% * $i / map-get($settings,"columns");
+	    }
+	    $i: $i+1;
+	  }
+	}
+	
+	@mixin media($queryString){
+	    @media #{$queryString} {
+	      @content;
+	    }
+	}
+	
+	@include renderGridStyles($settings);
+	
+	p {
+	  padding: 20px;
+	  color: white;
+	  background: #9b59b6;
+	  margin: 20px;
+	}
+	
+CSS：
+
+	.container {
+	  padding-right: 15px;
+	  padding-left: 15px;
+	  margin-right: auto;
+	  margin-left: auto;
+	  max-width: 800px;
+	}
+	
+	.row {
+	  margin-right: -15px;
+	  margin-left: -15px;
+	}
+	
+	@media (max-width: 480px) {
+	  .col-xs-1 {
+	    float: left;
+	    width: 8.33333%;
+	  }
+	
+	  .col-xs-2 {
+	    float: left;
+	    width: 16.66667%;
+	  }
+	
+	  .col-xs-3 {
+	    float: left;
+	    width: 25%;
+	  }
+	
+	  .col-xs-4 {
+	    float: left;
+	    width: 33.33333%;
+	  }
+	
+	  .col-xs-5 {
+	    float: left;
+	    width: 41.66667%;
+	  }
+	
+	  .col-xs-6 {
+	    float: left;
+	    width: 50%;
+	  }
+	
+	  .col-xs-7 {
+	    float: left;
+	    width: 58.33333%;
+	  }
+	
+	  .col-xs-8 {
+	    float: left;
+	    width: 66.66667%;
+	  }
+	
+	  .col-xs-9 {
+	    float: left;
+	    width: 75%;
+	  }
+	
+	  .col-xs-10 {
+	    float: left;
+	    width: 83.33333%;
+	  }
+	
+	  .col-xs-11 {
+	    float: left;
+	    width: 91.66667%;
+	  }
+	
+	  .col-xs-12 {
+	    float: left;
+	    width: 100%;
+	  }
+	}
+	@media (max-width: 768px) and (min-width: 481px) {
+	  .col-sm-1 {
+	    float: left;
+	    width: 8.33333%;
+	  }
+	
+	  .col-sm-2 {
+	    float: left;
+	    width: 16.66667%;
+	  }
+	
+	  .col-sm-3 {
+	    float: left;
+	    width: 25%;
+	  }
+	
+	  .col-sm-4 {
+	    float: left;
+	    width: 33.33333%;
+	  }
+	
+	  .col-sm-5 {
+	    float: left;
+	    width: 41.66667%;
+	  }
+	
+	  .col-sm-6 {
+	    float: left;
+	    width: 50%;
+	  }
+	
+	  .col-sm-7 {
+	    float: left;
+	    width: 58.33333%;
+	  }
+	
+	  .col-sm-8 {
+	    float: left;
+	    width: 66.66667%;
+	  }
+	
+	  .col-sm-9 {
+	    float: left;
+	    width: 75%;
+	  }
+	
+	  .col-sm-10 {
+	    float: left;
+	    width: 83.33333%;
+	  }
+	
+	  .col-sm-11 {
+	    float: left;
+	    width: 91.66667%;
+	  }
+	
+	  .col-sm-12 {
+	    float: left;
+	    width: 100%;
+	  }
+	}
+	@media (max-width: 1024px) and (min-width: 769px) {
+	  .col-md-1 {
+	    float: left;
+	    width: 8.33333%;
+	  }
+	
+	  .col-md-2 {
+	    float: left;
+	    width: 16.66667%;
+	  }
+	
+	  .col-md-3 {
+	    float: left;
+	    width: 25%;
+	  }
+	
+	  .col-md-4 {
+	    float: left;
+	    width: 33.33333%;
+	  }
+	
+	  .col-md-5 {
+	    float: left;
+	    width: 41.66667%;
+	  }
+	
+	  .col-md-6 {
+	    float: left;
+	    width: 50%;
+	  }
+	
+	  .col-md-7 {
+	    float: left;
+	    width: 58.33333%;
+	  }
+	
+	  .col-md-8 {
+	    float: left;
+	    width: 66.66667%;
+	  }
+	
+	  .col-md-9 {
+	    float: left;
+	    width: 75%;
+	  }
+	
+	  .col-md-10 {
+	    float: left;
+	    width: 83.33333%;
+	  }
+	
+	  .col-md-11 {
+	    float: left;
+	    width: 91.66667%;
+	  }
+	
+	  .col-md-12 {
+	    float: left;
+	    width: 100%;
+	  }
+	}
+	@media (min-width: 1025px) {
+	  .col-lg-1 {
+	    float: left;
+	    width: 8.33333%;
+	  }
+	
+	  .col-lg-2 {
+	    float: left;
+	    width: 16.66667%;
+	  }
+	
+	  .col-lg-3 {
+	    float: left;
+	    width: 25%;
+	  }
+	
+	  .col-lg-4 {
+	    float: left;
+	    width: 33.33333%;
+	  }
+	
+	  .col-lg-5 {
+	    float: left;
+	    width: 41.66667%;
+	  }
+	
+	  .col-lg-6 {
+	    float: left;
+	    width: 50%;
+	  }
+	
+	  .col-lg-7 {
+	    float: left;
+	    width: 58.33333%;
+	  }
+	
+	  .col-lg-8 {
+	    float: left;
+	    width: 66.66667%;
+	  }
+	
+	  .col-lg-9 {
+	    float: left;
+	    width: 75%;
+	  }
+	
+	  .col-lg-10 {
+	    float: left;
+	    width: 83.33333%;
+	  }
+	
+	  .col-lg-11 {
+	    float: left;
+	    width: 91.66667%;
+	  }
+	
+	  .col-lg-12 {
+	    float: left;
+	    width: 100%;
+	  }
+	}
+	p {
+	  padding: 20px;
+	  color: white;
+	  background: #9b59b6;
+	  margin: 20px;
+	}
 
 ##Output Style
 雖然 Sass 預設輸出的 CSS 樣式相當好，且反應了文檔結構。不過 Sass 也提供了多種的輸出樣式。Sass 提供了四種不同的輸出樣式，設定`:style`選項或是使用`--style`指令。
