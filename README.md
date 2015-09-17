@@ -8,6 +8,9 @@ Reference Sass official website,
 ##Install Sass
 If you want to use Sass, you can go to this website to install Sass on your computer [Install Sass](http://sass-lang.com/install)。
 
+##Partice
+You can use this website to see your Sass code complier to CSS.  
+[Sassmeister](http://sassmeister.com/)
 
 ##Chapter 1
 1. Basic Syntax
