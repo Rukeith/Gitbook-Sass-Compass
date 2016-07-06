@@ -10,7 +10,7 @@ If you want to use Sass, you can go to this website to install Sass on your comp
 
 ##Partice
 You can use this website to see your Sass code complier to CSS.  
-Sass convert to CSS [Sassmeister](http://sassmeister.com/)
+Sass convert to CSS [Sassmeister](http://sassmeister.com/)  
 CSS convert to Sass [css2sass](http://css2sass.herokuapp.com/)
 
 ##Chapter 1
