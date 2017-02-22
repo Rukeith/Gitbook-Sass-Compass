@@ -1,0 +1,8 @@
+title: Sass-compass-note
+description: A note about sass and compass which is writed by Rukeith
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-cayman
+
+gems:
+  - jekyll-mentions
